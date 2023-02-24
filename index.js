@@ -33,7 +33,6 @@ const readHashId = async (file) => {
     const hashId = crypto.createHash("sha256");
     hashId.update(fileBuffer);
     const hex = hashId.digest("hex");
-    console.log(hex);
     return hex;
   } catch (err) {
     console.error(`Error reading hash of ${file}`, err);
@@ -49,6 +48,7 @@ const storeDuplicated = (files) => {
       return false;
     }
   });
+  console.log(`[Total Duplicated]: ${duplicates.length}`);
   return duplicates;
 };
 
