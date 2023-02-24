@@ -16,10 +16,7 @@ const readDirectory = async (dir) => {
   try {
     console.log("-> Reading File...");
     console.time("[Done Reading]: ");
-    const dirHandle = await fs.opendir(dir);
-    const files = [];
-    for await (const dirent of dirHandle)
-      if (dirent.isFile()) files.push(dirent.name);
+    const files = await fs.readdir(dir, { withFileTypes: false });
     console.timeEnd("[Done Reading]: ");
 
     console.log(`[Total File]: ${files.length}`);
@@ -83,6 +80,7 @@ const compareHash = (originalFileHashes, storedFileHashes) => {
   console.time("[Done Re-Storing]");
   for (const file of originalFileHashes) set.add(file.hash);
   console.timeEnd("[Done Re-Storing]");
+  console.log("\n");
 
   console.log("-> Comparing Hash... ");
   console.time("[Done Comparing]");
@@ -142,11 +140,12 @@ const run = async () => {
     if (file.endsWith(".mp4")) continue;
     if (file.endsWith(".mkv")) continue;
     const filesFromDirectory = path.join(dir, file);
-    const hex = await readHash(filesFromDirectory);
-    hashes.push({ name: file, hash: hex });
+    hashes.push({
+      name: file,
+      hash: await readHash(filesFromDirectory)
+    });
   }
   console.timeEnd("[Done Reading]");
-  console.table(hashes);
   console.log("\n");
 
   const duplicates = storeDuplicated(hashes);
